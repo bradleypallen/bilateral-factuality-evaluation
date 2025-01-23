@@ -2,6 +2,7 @@ from langchain_huggingface import HuggingFaceEndpoint
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import PromptTemplate
+from langchain_core.messages import AIMessage
 from datetime import datetime, timezone
 from tqdm import tqdm
 from ast import literal_eval
@@ -79,7 +80,7 @@ Answer: {answer}
             return None
     
     def _llm(self, model, temperature=0.1):
-        if model in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini" ]:
+        if model in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-2024-11-20" ]:
             return ChatOpenAI(model_name=model, temperature=temperature)
         elif model in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20240620", "claude-3-haiku-20240307" ]:
             return ChatAnthropic(
@@ -119,36 +120,32 @@ Answer: {answer}
             falsifications = self.falsify_chain.batch(batch)
             verifications = self.verify_chain.batch(batch)
             for i in range(len(verifications)):
+                verification = verifications[i].content if isinstance(verifications[i], AIMessage) else verifications[i]
+                falsification = falsifications[i].content if isinstance(falsifications[i], AIMessage) else falsifications[i]
                 results.append({
                     "metadata": literal_eval(batch[i]["metadata"]),
                     "problem": batch[i]["problem"],
                     "answer": batch[i]["answer"],
                     "model_name": self.model_name,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
-                    # "total_tokens": verifications[i].response_metadata["token_usage"]["total_tokens"] + falsifications[i].response_metadata["token_usage"]["total_tokens"],
-                    # "verification": verifications[i].content,
-                    # "falsification": falsifications[i].content,
-                    "verification": verifications[i],
-                    "falsification": falsifications[i],
-                    # "evaluation": self._truth_value(verifications[i].content, falsifications[i].content)
-                    "evaluation": self._truth_value(verifications[i], falsifications[i])
+                    "verification": verification,
+                    "falsification": falsification,
+                    "evaluation": self._truth_value(verification, falsification)
                 })
         return results
     
     def invoke(self, datapoint):
         falsification = self.falsify_chain.invoke(datapoint)
         verification = self.verify_chain.invoke(datapoint)
+        verification = verification.content if isinstance(verification, AIMessage) else verification
+        falsification = falsification.content if isinstance(falsification, AIMessage) else falsification
         return {
             "metadata": literal_eval(datapoint["metadata"]),
             "problem": datapoint["problem"],
             "answer": datapoint["answer"],
             "model_name": self.model_name,
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            # "total_tokens": verifications[i].response_metadata["token_usage"]["total_tokens"] + falsifications[i].response_metadata["token_usage"]["total_tokens"],
-            # "verification": verifications[i].content,
-            # "falsification": falsifications[i].content,
             "verification": verification,
             "falsification": falsification,
-            # "evaluation": self._truth_value(verifications[i].content, falsifications[i].content)
             "evaluation": self._truth_value(verification, falsification)
         }
