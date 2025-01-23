@@ -11,12 +11,15 @@ import re, os
 class BilateralFactualityEvaluator:
     
     VERIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to assess whether the answer is true. 
+Your task is to verify that the answer to the question is true. 
 Please first explain your reasoning step by step, 
-then conclude with either "TRUE" if you have determined that the answer is true, 
+then conclude with either "TRUE" if you have verified the answer, 
 otherwise "CANNOT DETERMINE TRUE", 
 and only those conclusions, 
 at the very end of your reasoning.
+Please first explain your reasoning step by step. 
+Conclude with either "TRUE" if your reasoning verifies the answer, 
+or "CANNOT DETERMINE TRUE" if your reasoning does not verify the answer.
 
 Reasoning steps: 
 1. First verify the essential information is present 
@@ -29,12 +32,10 @@ Answer: {answer}
 """
 
     FALSIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to assess whether the answer is false. 
-Please first explain your reasoning step by step, 
-then conclude with either "FALSE" if you have determined that the answer is false, 
-otherwise "CANNOT DETERMINE FALSE", 
-and only those conclusions, 
-at the very end of your reasoning.
+Your task is to refute that the answer to the question is true. 
+Please first explain your reasoning step by step. 
+Conclude with either "FALSE" if your reasoning refutes the answer, 
+or "CANNOT DETERMINE FALSE" if your reasoning does not refute the answer.
 
 Reasoning steps: 
 1. First verify the essential information is present 
