@@ -1,0 +1,8 @@
+jupyter
+pandas
+tqdm
+langchain-huggingface
+langchain-openai
+langchain-anthropic
+langchain
+pyarrow
