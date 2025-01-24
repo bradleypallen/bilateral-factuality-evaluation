@@ -11,15 +11,10 @@ import re, os
 class BilateralFactualityEvaluator:
     
     VERIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to verify that the answer to the question is true. 
-Please first explain your reasoning step by step, 
-then conclude with either "TRUE" if you have verified the answer, 
-otherwise "CANNOT DETERMINE TRUE", 
-and only those conclusions, 
-at the very end of your reasoning.
+Your task is to verify the answer to the question. 
 Please first explain your reasoning step by step. 
-Conclude with either "TRUE" if your reasoning verifies the answer, 
-or "CANNOT DETERMINE TRUE" if your reasoning does not verify the answer.
+Then conclude with "TRUE" if you are certain that your reasoning verifies the answer, 
+otherwise conclude with "CANNOT DETERMINE TRUE" if you cannot definitively verify the answer.
 
 Reasoning steps: 
 1. First verify the essential information is present 
@@ -32,10 +27,10 @@ Answer: {answer}
 """
 
     FALSIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to refute that the answer to the question is true. 
+Your task is to refute the answer to the question. 
 Please first explain your reasoning step by step. 
-Conclude with either "FALSE" if your reasoning refutes the answer, 
-or "CANNOT DETERMINE FALSE" if your reasoning does not refute the answer.
+Conclude with  "FALSE" if you are certain that your reasoning refutes the answer, 
+otherwise conclude with "CANNOT DETERMINE FALSE" if you cannot definitively refute the answer.
 
 Reasoning steps: 
 1. First verify the essential information is present 
@@ -61,24 +56,18 @@ Answer: {answer}
         pattern = r'\b(TRUE|CANNOT DETERMINE TRUE|FALSE|CANNOT DETERMINE FALSE)\b'
         v_match = re.search(pattern, verification)
         f_match = re.search(pattern, falsification)
-        verification_result = v_match.group(1) if v_match else None
-        falsification_result = f_match.group(1) if f_match else None
+        verification_result = v_match.group(1) if v_match else 'CANNOT DETERMINE TRUE'
+        falsification_result = f_match.group(1) if f_match else 'CANNOT DETERMINE FALSE'
         if verification_result == 'TRUE':
             if falsification_result == 'FALSE':
                 return 'b'
-            elif falsification_result == 'CANNOT DETERMINE FALSE': # Should None value be treated as "CANNOT DETERMINE X"?
-                return 't'
             else:
-                return None
-        elif verification_result == 'CANNOT DETERMINE TRUE':
+                return 't'
+        else:
             if falsification_result == 'FALSE':
                 return 'f'
-            elif falsification_result == 'CANNOT DETERMINE FALSE':
-                return 'n'
             else:
-                return None
-        else:
-            return None
+                return 'n'
     
     def _llm(self, model, temperature=0.1):
         if model in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-2024-11-20" ]:
