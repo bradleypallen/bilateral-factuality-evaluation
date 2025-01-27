@@ -19,7 +19,7 @@ class Model:
     def _llm(self, model_name, temperature=0.1):
         if model_name in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-2024-11-20" ]:
             return ChatOpenAI(model_name=model_name, temperature=temperature)
-        elif model_name in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20240620", "claude-3-haiku-20240307" ]:
+        elif model_name in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022" ]:
             return ChatAnthropic(
                 temperature=temperature, 
                 anthropic_api_key=os.environ["ANTHROPIC_API_KEY"], 
@@ -32,8 +32,9 @@ class Model:
             "google/gemma-2-9b-it",
             "google/gemma-7b-it", 
             "google/gemma-2b-it",
-            "meta-llama/Meta-Llama-3-70B-Instruct", 
+            "meta-llama/Llama-3.3-70B-Instruct", 
             "microsoft/Phi-3-mini-128k-instruct",
+            "deepseek-ai/DeepSeek-R1",
             ]:
             return HuggingFaceEndpoint(
                 repo_id=model_name, 
@@ -81,9 +82,17 @@ Answer: {answer}
     
     def batch(self, data):
         results = []
+        wait_time = 10
         batches = [ data[i:i+self.batch_size] for i in range(0, len(data), self.batch_size) ] 
         for batch in tqdm(batches, desc=f'{self.model_name:36}', total=len(batches)):
-            evaluations = self.chain.batch(batch)
+            while True:
+                try:
+                    evaluations = self.chain.batch(batch)
+                    break
+                except Exception as e:
+                    time.sleep(wait_time)
+                    wait_time *= 2
+                    continue
             for i in range(len(evaluations)):
                 reasoning = evaluations[i].content if isinstance(evaluations[i], AIMessage) else evaluations[i]
                 results.append({
@@ -112,37 +121,73 @@ Answer: {answer}
     
 class BilateralFactualityEvaluator(Model):
     
-    VERIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to verify the answer to the question. 
-Please first explain your reasoning step by step. 
-Then conclude with "TRUE" if you are certain that your reasoning verifies the answer, 
-otherwise conclude with "CANNOT DETERMINE TRUE" if you cannot definitively verify the answer.
+#     VERIFICATION_PROMPT = """Here is a factual question and a potential answer. 
+# Your task is to verify the answer to the question. 
+# Please first explain your reasoning step by step. 
+# Then conclude with "TRUE" if you are certain that your reasoning verifies the answer, 
+# otherwise conclude with "CANNOT DETERMINE TRUE" if you cannot definitively verify the answer.
 
-Reasoning steps: 
-1. First verify the essential information is present 
-2. Check for any supporting facts 
-3. Consider question context for implied terms 
-4. Note if any missing information is essential vs optional 
+# Reasoning steps: 
+# 1. First verify the essential information is present 
+# 2. Check for any supporting facts 
+# 3. Consider question context for implied terms 
+# 4. Note if any missing information is essential vs optional 
+
+# Question: {problem}
+# Answer: {answer}
+# """
+
+#     FALSIFICATION_PROMPT = """Here is a factual question and a potential answer. 
+# Your task is to refute the answer to the question. 
+# Please first explain your reasoning step by step. 
+# Conclude with  "FALSE" if you are certain that your reasoning refutes the answer, 
+# otherwise conclude with "CANNOT DETERMINE FALSE" if you cannot definitively refute the answer.
+
+# Reasoning steps: 
+# 1. First verify the essential information is present 
+# 2. Check for any contradictory facts
+# 3. Consider question context for implied terms 
+# 4. Note if any missing information is essential vs optional 
+
+# Question: {problem}
+# Answer: {answer}
+# """
+
+    VERIFICATION_PROMPT = """Evaluate if this answer is definitively TRUE for the given question.
+
+Required steps:
+1. Parse key claims in both question and answer
+2. Verify each claim against known facts
+3. Identify any unstated assumptions
+4. Check for temporal/contextual dependencies
+5. Validate logical connections between claims
 
 Question: {problem}
 Answer: {answer}
-"""
 
-    FALSIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to refute the answer to the question. 
-Please first explain your reasoning step by step. 
-Conclude with  "FALSE" if you are certain that your reasoning refutes the answer, 
-otherwise conclude with "CANNOT DETERMINE FALSE" if you cannot definitively refute the answer.
+Conclude EXACTLY with either:
+"TRUE" - Only if every claim is independently verified
+"CANNOT DETERMINE TRUE" - If any essential claim cannot be verified
 
-Reasoning steps: 
-1. First verify the essential information is present 
-2. Check for any contradictory facts
-3. Consider question context for implied terms 
-4. Note if any missing information is essential vs optional 
+Explain your verification process first, then your conclusion."""
+
+    FALSIFICATION_PROMPT = """Evaluate if this answer is definitively FALSE for the given question.
+
+Required steps:
+1. Parse key claims in both question and answer
+2. Search for any direct contradictions
+3. Test for logical inconsistencies
+4. Check for impossible conditions
+5. Identify mutually exclusive scenarios
 
 Question: {problem}
 Answer: {answer}
-"""
+
+Conclude EXACTLY with either:
+"FALSE" - Only if a contradiction is found
+"CANNOT DETERMINE FALSE" - If no definitive contradiction exists
+
+Explain your falsification process first, then your conclusion."""
 
     def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT, falsification_prompt=FALSIFICATION_PROMPT):
         super().__init__(model_name, batch_size, temperature)
@@ -172,8 +217,22 @@ Answer: {answer}
         results = []
         batches = [ data[i:i+self.batch_size] for i in range(0, len(data), self.batch_size) ] 
         for batch in tqdm(batches, desc=f'{self.model_name:36}', total=len(batches)):
-            falsifications = self.falsify_chain.batch(batch)
-            verifications = self.verify_chain.batch(batch)
+            while True:
+                try:
+                    verifications = self.verify_chain.batch(batch)
+                    break
+                except Exception as e:
+                    time.sleep(wait_time)
+                    wait_time *= 2
+                    continue
+            while True:
+                try:
+                    falsifications = self.falsify_chain.batch(batch)
+                    break
+                except Exception as e:
+                    time.sleep(wait_time)
+                    wait_time *= 2
+                    continue
             for i in range(len(verifications)):
                 verification = verifications[i].content if isinstance(verifications[i], AIMessage) else verifications[i]
                 falsification = falsifications[i].content if isinstance(falsifications[i], AIMessage) else falsifications[i]
