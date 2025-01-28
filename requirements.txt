@@ -6,3 +6,4 @@ langchain-openai
 langchain-anthropic
 langchain
 pyarrow
+matplotlib
