@@ -4,6 +4,7 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import AIMessage
 from datetime import datetime, timezone
+from prompts import FACTUALITY_PROMPT_V5, VERIFICATION_PROMPT_V5, FALSIFICATION_PROMPT_V5
 from tqdm import tqdm
 from ast import literal_eval
 import re, os, time
@@ -47,24 +48,7 @@ class Model:
 
 class UnilateralFactualityEvaluator(Model):
     
-    FACTUALITY_PROMPT = """Here is a factual question and a potential answer. 
-Your task is to determine the truth value of the answer to the question. 
-Please first explain your reasoning step by step. 
-Then conclude with "TRUE" if you are certain that your reasoning verifies the answer, 
-otherwise conclude with "FALSE" if you are certain that your reasoning refutes the answer.
-
-Reasoning steps: 
-1. First verify the essential information is present 
-2. Check for any supporting facts 
-3. Check for any contradictory facts
-4. Consider question context for implied terms 
-5. Note if any missing information is essential vs optional 
-
-Question: {problem}
-Answer: {answer}
-"""
-
-    def __init__(self, model_name, batch_size=1, temperature=0.1, factuality_prompt=FACTUALITY_PROMPT):
+    def __init__(self, model_name, batch_size=1, temperature=0.1, factuality_prompt=FACTUALITY_PROMPT_V5):
         super().__init__(model_name, batch_size, temperature)
         prompt = PromptTemplate(input_variables=["problem", "answer"], template=factuality_prompt)
         self.chain = prompt | self.llm
@@ -122,43 +106,7 @@ Answer: {answer}
     
 class BilateralFactualityEvaluator(Model):
     
-    VERIFICATION_PROMPT = """Evaluate if this answer is definitively TRUE for the given question.
-
-Required steps:
-1. Parse key claims in both question and answer
-2. Verify each claim against known facts
-3. Identify any unstated assumptions
-4. Check for temporal/contextual dependencies
-5. Validate logical connections between claims
-
-Question: {problem}
-Answer: {answer}
-
-Conclude EXACTLY with either:
-"TRUE" - Only if every claim is independently verified
-"CANNOT DETERMINE TRUE" - If any essential claim cannot be verified
-
-Explain your verification process first, then your conclusion."""
-
-    FALSIFICATION_PROMPT = """Evaluate if this answer is definitively FALSE for the given question.
-
-Required steps:
-1. Parse key claims in both question and answer
-2. Search for any direct contradictions
-3. Test for logical inconsistencies
-4. Check for impossible conditions
-5. Identify mutually exclusive scenarios
-
-Question: {problem}
-Answer: {answer}
-
-Conclude EXACTLY with either:
-"FALSE" - Only if a contradiction is found
-"CANNOT DETERMINE FALSE" - If no definitive contradiction exists
-
-Explain your falsification process first, then your conclusion."""
-
-    def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT, falsification_prompt=FALSIFICATION_PROMPT):
+    def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT_V5, falsification_prompt=FALSIFICATION_PROMPT_V5):
         super().__init__(model_name, batch_size, temperature)
         verify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=verification_prompt)
         falsify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=falsification_prompt)
