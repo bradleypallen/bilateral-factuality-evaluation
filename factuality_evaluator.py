@@ -90,6 +90,7 @@ Answer: {answer}
                     evaluations = self.chain.batch(batch)
                     break
                 except Exception as e:
+                    print(f"Exception {type(e).__name__}, waiting {wait_time} seconds to retry batch...")
                     time.sleep(wait_time)
                     wait_time *= 2
                     continue
@@ -121,38 +122,6 @@ Answer: {answer}
     
 class BilateralFactualityEvaluator(Model):
     
-#     VERIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-# Your task is to verify the answer to the question. 
-# Please first explain your reasoning step by step. 
-# Then conclude with "TRUE" if you are certain that your reasoning verifies the answer, 
-# otherwise conclude with "CANNOT DETERMINE TRUE" if you cannot definitively verify the answer.
-
-# Reasoning steps: 
-# 1. First verify the essential information is present 
-# 2. Check for any supporting facts 
-# 3. Consider question context for implied terms 
-# 4. Note if any missing information is essential vs optional 
-
-# Question: {problem}
-# Answer: {answer}
-# """
-
-#     FALSIFICATION_PROMPT = """Here is a factual question and a potential answer. 
-# Your task is to refute the answer to the question. 
-# Please first explain your reasoning step by step. 
-# Conclude with  "FALSE" if you are certain that your reasoning refutes the answer, 
-# otherwise conclude with "CANNOT DETERMINE FALSE" if you cannot definitively refute the answer.
-
-# Reasoning steps: 
-# 1. First verify the essential information is present 
-# 2. Check for any contradictory facts
-# 3. Consider question context for implied terms 
-# 4. Note if any missing information is essential vs optional 
-
-# Question: {problem}
-# Answer: {answer}
-# """
-
     VERIFICATION_PROMPT = """Evaluate if this answer is definitively TRUE for the given question.
 
 Required steps:
@@ -222,6 +191,7 @@ Explain your falsification process first, then your conclusion."""
                     verifications = self.verify_chain.batch(batch)
                     break
                 except Exception as e:
+                    print(f"Exception {type(e).__name__}, waiting {wait_time} seconds to retry verification batch...")
                     time.sleep(wait_time)
                     wait_time *= 2
                     continue
@@ -230,6 +200,7 @@ Explain your falsification process first, then your conclusion."""
                     falsifications = self.falsify_chain.batch(batch)
                     break
                 except Exception as e:
+                    print(f"Encountered {type(e).__name__}, waiting {wait_time} seconds to retry falsification batch...")
                     time.sleep(wait_time)
                     wait_time *= 2
                     continue
