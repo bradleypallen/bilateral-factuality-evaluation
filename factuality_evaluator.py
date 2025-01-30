@@ -132,6 +132,7 @@ class BilateralFactualityEvaluator(Model):
     
     def batch(self, data):
         results = []
+        wait_time = 10
         batches = [ data[i:i+self.batch_size] for i in range(0, len(data), self.batch_size) ] 
         for batch in tqdm(batches, desc=f'{self.model_name:36}', total=len(batches)):
             while True:
