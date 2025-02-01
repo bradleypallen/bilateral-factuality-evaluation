@@ -7,3 +7,5 @@ langchain-anthropic
 langchain
 pyarrow
 matplotlib
+pycm
+seaborn
