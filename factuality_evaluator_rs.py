@@ -18,7 +18,15 @@ class Model:
         self.temperature = temperature
 
     def _llm(self, model_name, temperature=0.1):
-        if model_name in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-2024-11-20" ]:
+        if model_name in [ 
+            "gpt-3.5-turbo", 
+            "gpt-4-1106-preview", 
+            "gpt-4-0125-preview", 
+            "gpt-4o-2024-05-13", 
+            "gpt-4o-mini", 
+            "gpt-4o-2024-11-20",
+            "o3-mini",
+            ]:
             return ChatOpenAI(model_name=model_name, temperature=temperature)
         elif model_name in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022" ]:
             return ChatAnthropic(
