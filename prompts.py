@@ -70,6 +70,24 @@ Conclude EXACTLY with either:
 
 Explain your reasoning first, then provide your conclusion."""
 
+VERIFICATION_PROMPT_V6 = """Evaluate if this answer is definitively TRUE for the given question.
+
+Required steps:
+1. Parse key claims in both question and answer
+2. Verify each claim against known facts
+3. Identify any unstated assumptions
+4. Check for temporal/contextual dependencies
+5. Validate logical connections between claims
+
+Question: {problem}
+Answer: {answer}
+
+Conclude EXACTLY with either:
+"VERFIED" - Only if every claim is independently verified
+"CANNOT VERIFY" - If any essential claim cannot be verified
+
+Explain your reasoning first, then provide your conclusion."""
+
 FALSIFICATION_PROMPT_V4 = """Evaluate if this answer is definitively FALSE for the given question.
 
 Required steps:
@@ -103,5 +121,23 @@ Answer: {answer}
 Conclude EXACTLY with either:
 "FALSE" - Only if a contradiction is found
 "CANNOT DETERMINE FALSE" - If no definitive contradiction exists
+
+Explain your reasoning first, then provide your conclusion."""
+
+REFUTATION_PROMPT_V6 = """Evaluate if this answer is definitively FALSE for the given question.
+
+Required steps:
+1. Parse key claims in both question and answer
+2. Search for any direct contradictions
+3. Test for logical inconsistencies
+4. Check for impossible conditions
+5. Identify mutually exclusive scenarios
+
+Question: {problem}
+Answer: {answer}
+
+Conclude EXACTLY with either:
+"REFUTED" - Only if a contradiction is found
+"CANNOT REFUTE" - If no definitive contradiction exists
 
 Explain your reasoning first, then provide your conclusion."""

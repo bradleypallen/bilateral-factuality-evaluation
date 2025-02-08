@@ -51,9 +51,28 @@ class Model:
                 timeout=300,
                 huggingfacehub_api_token=os.environ["HUGGINGFACEHUB_API_TOKEN"]
             )
+        elif model_name in [
+            "google/gemma-2-27b-it",
+            "microsoft/phi-4",
+            "deepseek/deepseek-r1-distill-llama-8b",
+            "deepseek/deepseek-r1:free",
+            "google/gemini-2.0-flash-lite-preview-02-05:free"
+            ]:
+            return ChatOpenAI(
+                openai_api_key=os.environ["OPENROUTER_API_KEY"],
+                openai_api_base=os.environ["OPENROUTER_BASE_URL"],
+                model_name=model_name, 
+                temperature=temperature
+                # model_kwargs={
+                #     "headers": {
+                #         "HTTP-Referer": os.environ("YOUR_SITE_URL"),
+                #         "X-Title": os.environ("YOUR_SITE_NAME"),
+                #     }
+                # }
+            )
         else:
             raise Exception(f'Model {model_name} not supported')
-
+     
 class UnilateralFactualityEvaluator(Model):
     
     def __init__(self, model_name, batch_size=1, temperature=0.1, factuality_prompt=FACTUALITY_PROMPT_V5):
