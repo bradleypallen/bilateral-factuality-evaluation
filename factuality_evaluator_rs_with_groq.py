@@ -1,10 +1,11 @@
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import AIMessage
 from datetime import datetime, timezone
-from prompts import FACTUALITY_PROMPT_V5, VERIFICATION_PROMPT_V6, REFUTATION_PROMPT_V6
+from prompts import FACTUALITY_PROMPT_V5, VERIFICATION_PROMPT_V5, FALSIFICATION_PROMPT_V5
 from tqdm import tqdm
 from ast import literal_eval
 import re, os, time
@@ -18,15 +19,7 @@ class Model:
         self.temperature = temperature
 
     def _llm(self, model_name, temperature=0.1):
-        if model_name in [ 
-            "gpt-3.5-turbo", 
-            "gpt-4-1106-preview", 
-            "gpt-4-0125-preview", 
-            "gpt-4o", 
-            "gpt-4o-mini", 
-            "gpt-4o-2024-11-20",
-            "o3-mini",
-            ]:
+        if model_name in [ "gpt-3.5-turbo", "gpt-4-1106-preview", "gpt-4-0125-preview", "gpt-4o-2024-05-13", "gpt-4o-mini", "gpt-4o-2024-11-20" ]:
             return ChatOpenAI(model_name=model_name, temperature=temperature)
         elif model_name in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022" ]:
             return ChatAnthropic(
@@ -51,28 +44,15 @@ class Model:
                 timeout=300,
                 huggingfacehub_api_token=os.environ["HUGGINGFACEHUB_API_TOKEN"]
             )
-        elif model_name in [
-            "google/gemma-2-27b-it",
-            "microsoft/phi-4",
-            "deepseek/deepseek-r1-distill-llama-8b",
-            "deepseek/deepseek-r1:free",
-            "google/gemini-2.0-flash-lite-preview-02-05:free"
-            ]:
-            return ChatOpenAI(
-                openai_api_key=os.environ["OPENROUTER_API_KEY"],
-                openai_api_base=os.environ["OPENROUTER_BASE_URL"],
-                model_name=model_name, 
-                temperature=temperature
-                # model_kwargs={
-                #     "headers": {
-                #         "HTTP-Referer": os.environ("YOUR_SITE_URL"),
-                #         "X-Title": os.environ("YOUR_SITE_NAME"),
-                #     }
-                # }
+        elif model_name in ["llama3-8b-8192", "gemma2-9b-it"]:
+            return ChatGroq(
+                model_name=model_name,
+                temperature=temperature,
+                api_key=os.environ["GROQ_API_KEY"]
             )
         else:
             raise Exception(f'Model {model_name} not supported')
-     
+
 class UnilateralFactualityEvaluator(Model):
     
     def __init__(self, model_name, batch_size=1, temperature=0.1, factuality_prompt=FACTUALITY_PROMPT_V5):
@@ -112,7 +92,6 @@ class UnilateralFactualityEvaluator(Model):
                     "metadata": literal_eval(batch[i]["metadata"]) if "metadata" in batch[i] else None,
                     "problem": batch[i]["problem"],
                     "answer": batch[i]["answer"],
-                    "label": batch[i]["label"] if "label" in batch[i] else None,
                     "model_name": self.model_name,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "reasoning": reasoning,
@@ -127,7 +106,6 @@ class UnilateralFactualityEvaluator(Model):
             "metadata": literal_eval(datapoint["metadata"]) if "metadata" in datapoint else None,
             "problem": datapoint["problem"],
             "answer": datapoint["answer"],
-            "label": datapoint["label"] if "label" in datapoint else None,
             "model_name": self.model_name,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "reasoning": reasonings,
@@ -136,28 +114,28 @@ class UnilateralFactualityEvaluator(Model):
         
 class BilateralFactualityEvaluator(Model):
     
-    def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT_V6, refutation_prompt=REFUTATION_PROMPT_V6):
+    def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT_V5, falsification_prompt=FALSIFICATION_PROMPT_V5):
         super().__init__(model_name, batch_size, temperature)
         verify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=verification_prompt)
-        falsify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=refutation_prompt)
+        falsify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=falsification_prompt)
         self.verify_chain = verify_prompt | self.llm
         self.falsify_chain = falsify_prompt | self.llm
 
-    def _truth_value(self, verifications, refutations):
-        pattern = r'\b(VERIFIED|CANNOT VERIFY|REFUTED|CANNOT REFUTE)\b'
+    def _truth_value(self, verifications, falsifications):
+        pattern = r'\b(TRUE|CANNOT DETERMINE TRUE|FALSE|CANNOT DETERMINE FALSE)\b'
         v_matches = [ re.findall(pattern, verification) for verification in verifications ]
-        r_matches = [ re.findall(pattern, refutation) for refutation in refutations ]
-        verification_results = [ match[-1] if match else 'CANNOT VERIFY' for match in v_matches ]
-        refutation_results = [ match[-1] if match else 'CANNOT REFUTE' for match in r_matches ]
+        f_matches = [ re.findall(pattern, falsification) for falsification in falsifications ]
+        verification_results = [ match[-1] if match else 'CANNOT DETERMINE TRUE' for match in v_matches ]
+        falsification_results = [ match[-1] if match else 'CANNOT DETERMINE FALSE' for match in f_matches ]
         verification_result = max(set(verification_results), key=verification_results.count)
-        refutation_result = max(set(refutation_results), key=refutation_results.count)
-        if verification_result == 'VERIFIED':
-            if refutation_result == 'REFUTED':
+        falsification_result = max(set(falsification_results), key=falsification_results.count)
+        if verification_result == 'TRUE':
+            if falsification_result == 'FALSE':
                 return 'b'
             else:
                 return 't'
         else:
-            if refutation_result == 'REFUTED':
+            if falsification_result == 'FALSE':
                 return 'f'
             else:
                 return 'n'
@@ -179,42 +157,40 @@ class BilateralFactualityEvaluator(Model):
             wait_time = 10
             while True:
                 try:
-                    refutations = self.falsify_chain.batch(batch)
+                    falsifications = self.falsify_chain.batch(batch)
                     break
                 except Exception as e:
-                    print(f"Encountered {type(e).__name__}, waiting {wait_time} seconds to retry refutation batch...")
+                    print(f"Encountered {type(e).__name__}, waiting {wait_time} seconds to retry falsification batch...")
                     time.sleep(wait_time)
                     wait_time *= 2
                     continue
             for i in range(len(verifications)):
                 verification = verifications[i].content if isinstance(verifications[i], AIMessage) else verifications[i]
-                refutation = refutations[i].content if isinstance(refutations[i], AIMessage) else refutations[i]
+                falsification = falsifications[i].content if isinstance(falsifications[i], AIMessage) else falsifications[i]
                 results.append({
                     "metadata": literal_eval(batch[i]["metadata"]) if "metadata" in batch[i] else None,
                     "problem": batch[i]["problem"],
                     "answer": batch[i]["answer"],
-                    "label": batch[i]["label"] if "label" in batch[i] else None,
                     "model_name": self.model_name,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                     "verification": verification,
-                    "refutation": refutation,
-                    "evaluation": self._truth_value([ verification ], [ refutation ])
+                    "falsification": falsification,
+                    "evaluation": self._truth_value([ verification ], [ falsification ])
                 })
         return results
     
     def invoke(self, datapoint, samples=1):
         verifications = [ self.verify_chain.invoke(datapoint) for i in range(samples) ]
-        refutations = [ self.falsify_chain.invoke(datapoint) for i in range(samples) ]
+        falsifications = [ self.falsify_chain.invoke(datapoint) for i in range(samples) ]
         verifications = [ verification.content if isinstance(verification, AIMessage) else verification for verification in verifications ]
-        refutations = [ refutation.content if isinstance(refutation, AIMessage) else refutation for refutation in refutations ]
+        falsifications = [ falsification.content if isinstance(falsification, AIMessage) else falsification for falsification in falsifications ]
         return {
             "metadata": literal_eval(datapoint["metadata"]) if "metadata" in datapoint else None,
             "problem": datapoint["problem"],
             "answer": datapoint["answer"],
-            "label": datapoint["label"] if "label" in datapoint else None,
             "model_name": self.model_name,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "verification": verifications,
-            "refutation": refutations,
-            "evaluation": self._truth_value(verifications, refutations)
+            "falsification": falsifications,
+            "evaluation": self._truth_value(verifications, falsifications)
         }
