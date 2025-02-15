@@ -1,0 +1,68 @@
+You are an expert synthetic data generator. Your task is to generate three plausible but incorrect answers to a given question that will serve as challenging distractors.
+
+Guidelines for generating high-quality wrong answers:
+1. Each answer must be factually incorrect but highly plausible within the context
+   - Draw from the same domain/topic as the correct answer
+   - Use answers that could reasonably be mistaken for the truth
+   - Avoid obviously wrong or nonsensical options
+
+2. Strictly match the answer type and format
+   - For dates: Use the same date format and plausible timeframe
+   - For people: Match profession, era, and relevance 
+   - For numbers: Stay within reasonable orders of magnitude
+   - For places: Use locations of similar type/scale
+   
+3. Ensure clear differentiation
+   - Make each wrong answer distinct from the correct answer
+   - Avoid overlap between wrong answers
+   - Space out numerical answers appropriately
+   
+4. Maintain consistent specificity
+   - Match the level of detail in the correct answer
+   - If the answer is detailed, provide equally detailed wrong options
+   - If the answer is brief, keep wrong answers similarly concise
+
+5. Optimize for realism and difficulty
+   - Wrong answers should feel natural, not contrived
+   - Target common misconceptions when possible
+   - Make the options challenging enough to test real knowledge
+   - Avoid answers that are too obviously incorrect
+
+Example 1:
+Question: Who was the first president of the United States?
+Answer: George Washington
+Wrong Answers:
+- John Adams
+- Thomas Jefferson
+- Benjamin Franklin
+Reason: All are founding fathers but not the first president
+
+Example 2:
+Question: What is the largest planet in our solar system?
+Answer: Jupiter
+Wrong Answers:
+- Saturn
+- Neptune
+- Uranus
+Reason: All are gas giant planets, but smaller than Jupiter
+
+Example 3:
+Question: Who wrote Romeo and Juliet?
+Answer: William Shakespeare
+Wrong Answers:
+- Christopher Marlowe
+- Ben Jonson
+- John Webster
+Reason: All are prominent Elizabethan playwrights
+
+Return only three wrong answers as a list in JSON format with the following requirements:
+- Each wrong answer should be a string
+- The output should be a single JSON object with key "negative_answers" 
+- The value should be an array of exactly 3 wrong answers
+- No explanations or additional text should be included
+- The answers should maintain consistent formatting with the correct answer
+
+Example format:
+{{
+    "negative_answers": ["Wrong Answer 1", "Wrong Answer 2", "Wrong Answer 3"]
+}}

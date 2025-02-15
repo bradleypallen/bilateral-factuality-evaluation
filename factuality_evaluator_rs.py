@@ -27,7 +27,10 @@ class Model:
             "gpt-4o-2024-11-20",
             "o3-mini",
             ]:
-            return ChatOpenAI(model_name=model_name, temperature=temperature)
+            return ChatOpenAI(
+                model_name=model_name, 
+                temperature=temperature                
+            )
         elif model_name in [ "claude-3-opus-20240229", "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022" ]:
             return ChatAnthropic(
                 temperature=temperature, 
@@ -55,20 +58,26 @@ class Model:
             "google/gemma-2-27b-it",
             "microsoft/phi-4",
             "deepseek/deepseek-r1-distill-llama-8b",
-            "deepseek/deepseek-r1:free",
-            "google/gemini-2.0-flash-lite-preview-02-05:free"
+            "google/gemini-2.0-flash-001"
             ]:
             return ChatOpenAI(
                 openai_api_key=os.environ["OPENROUTER_API_KEY"],
                 openai_api_base=os.environ["OPENROUTER_BASE_URL"],
                 model_name=model_name, 
                 temperature=temperature
-                # model_kwargs={
-                #     "headers": {
-                #         "HTTP-Referer": os.environ("YOUR_SITE_URL"),
-                #         "X-Title": os.environ("YOUR_SITE_NAME"),
-                #     }
-                # }
+            )
+        elif model_name in [
+            "nf-gpt-4",
+            "nf-gpt-4o-mini",
+            "nf-gpt-4o",
+            "nf-Llama-3.1-8b-instruct",
+            "nf-Llama-3.1-70b-instruct"
+            ]:
+            return ChatOpenAI(
+                openai_api_key=os.environ["AI_RESEARCH_PROXY_API_KEY"],
+                openai_api_base=os.environ["AI_RESEARCH_PROXY_BASE_URL"],
+                model_name=model_name, 
+                temperature=temperature
             )
         else:
             raise Exception(f'Model {model_name} not supported')

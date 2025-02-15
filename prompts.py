@@ -83,7 +83,7 @@ Question: {problem}
 Answer: {answer}
 
 Conclude EXACTLY with either:
-"VERFIED" - Only if every claim is independently verified
+"VERIFIED" - Only if every claim is independently verified
 "CANNOT VERIFY" - If any essential claim cannot be verified
 
 Explain your reasoning first, then provide your conclusion."""
