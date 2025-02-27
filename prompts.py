@@ -34,6 +34,15 @@ Conclude EXACTLY with either:
 Explain your reasoning first, then provide your conclusion.
 """
 
+FACTUALITY_PROMPT_V6 = """Evaluate if the answer is definitively TRUE or FALSE for the given question. 
+
+Question: {problem}
+Answer: {answer}
+
+Conclude EXACTLY with either:
+"TRUE" - Only if every claim is independently verified
+"FALSE" - If any essential claim cannot be verified"""
+
 VERIFICATION_PROMPT_V4 = """Evaluate if this answer is definitively TRUE for the given question.
 
 Required steps:
@@ -88,6 +97,15 @@ Conclude EXACTLY with either:
 
 Explain your reasoning first, then provide your conclusion."""
 
+VERIFICATION_PROMPT_V7 = """Evaluate if this answer is definitively TRUE for the given question.
+
+Question: {problem}
+Answer: {answer}
+
+Conclude EXACTLY with either:
+"VERIFIED" - Only if every claim is independently verified
+"CANNOT VERIFY" - If any essential claim cannot be verified"""
+
 FALSIFICATION_PROMPT_V4 = """Evaluate if this answer is definitively FALSE for the given question.
 
 Required steps:
@@ -141,3 +159,12 @@ Conclude EXACTLY with either:
 "CANNOT REFUTE" - If no definitive contradiction exists
 
 Explain your reasoning first, then provide your conclusion."""
+
+REFUTATION_PROMPT_V7 = """Evaluate if this answer is definitively FALSE for the given question.
+
+Question: {problem}
+Answer: {answer}
+
+Conclude EXACTLY with either:
+"REFUTED" - Only if a contradiction is found
+"CANNOT REFUTE" - If no definitive contradiction exists"""
