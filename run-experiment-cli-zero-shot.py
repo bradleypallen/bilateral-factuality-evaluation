@@ -2,8 +2,7 @@ import argparse
 from factuality_evaluator_rs import UnilateralFactualityEvaluator, BilateralFactualityEvaluator
 from prompts import FACTUALITY_PROMPT_V6, VERIFICATION_PROMPT_V7, REFUTATION_PROMPT_V7
 from tqdm import tqdm
-import json
-import os
+import json, os, time
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -76,6 +75,7 @@ def generate_results(model, mode, filename, dataset, samples):
     for datapoint in tqdm(dataset[i:], desc=f'{model.model_name:36} {mode}', initial=i, total=len(dataset)):
         results.append(model.invoke(datapoint, samples=samples))
         json.dump(results, open(filename, "w+"))
+        time.sleep(5)
 
 def main():
     # Initialize environment variables
