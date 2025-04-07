@@ -43,6 +43,28 @@ Conclude EXACTLY with either:
 "TRUE" - Only if every claim is independently verified
 "FALSE" - If any essential claim cannot be verified"""
 
+FACTUALITY_PROMPT_V8 = """Extract the core answer from the response, then evaluate if this extracted answer is definitively TRUE or FALSE for the question.
+
+STEP 1: Extract the specific entity, term, or value that directly answers the question:
+Question: {problem}
+Response: {answer}
+
+Extracted Answer: 
+
+STEP 2: Evaluate if the extracted answer is definitively TRUE or FALSE:
+1. Verify the extracted answer against known facts
+2. Check for any contradictory information
+3. Consider question context and any implied terms
+4. Determine if the extracted answer correctly responds to what was asked
+
+Reasoning:
+
+Conclude EXACTLY with either:
+"TRUE" - Only if the extracted answer is definitively correct
+"FALSE" - If the extracted answer is incorrect or cannot be verified
+
+Explain your reasoning first, then provide your conclusion."""
+
 VERIFICATION_PROMPT_V4 = """Evaluate if this answer is definitively TRUE for the given question.
 
 Required steps:
@@ -106,6 +128,26 @@ Conclude EXACTLY with either:
 "VERIFIED" - Only if every claim is independently verified
 "CANNOT VERIFY" - If any essential claim cannot be verified"""
 
+VERIFICATION_PROMPT_V8 = """Extract the core answer from the LLM response, then evaluate if this extracted answer is TRUE for the question.
+
+STEP 1: Extract the specific entity, term, or value that directly answers the question:
+Question: {problem}
+LLM Response: {answer}
+
+Extracted Answer: 
+
+STEP 2: Evaluate if the extracted answer is definitively TRUE:
+1. Verify the extracted answer against known facts
+2. Consider temporal/contextual factors
+3. Determine if it correctly responds to what the question is asking
+
+Reasoning:
+
+Conclude EXACTLY with either:
+"VERIFIED" - Only if the extracted answer is definitively correct
+"CANNOT VERIFY" - If the extracted answer cannot be verified as correct"""
+
+
 FALSIFICATION_PROMPT_V4 = """Evaluate if this answer is definitively FALSE for the given question.
 
 Required steps:
@@ -168,3 +210,35 @@ Answer: {answer}
 Conclude EXACTLY with either:
 "REFUTED" - Only if a contradiction is found
 "CANNOT REFUTE" - If no definitive contradiction exists"""
+
+REFUTATION_PROMPT_V8 = """Extract the core answer from the LLM response, then evaluate if this extracted answer is FALSE for the question.
+
+STEP 1: Extract the specific entity, term, or value that directly answers the question:
+Question: {problem}
+LLM Response: {answer}
+
+Extracted Answer: 
+
+STEP 2: Evaluate if the extracted answer is definitively FALSE:
+1. Check if the extracted answer contradicts established facts
+2. Consider if temporal/contextual factors make this answer incorrect
+3. Determine if it fails to correctly answer what the question is asking
+
+Reasoning:
+
+Conclude EXACTLY with either:
+"REFUTED" - Only if the extracted answer is definitively incorrect
+"CANNOT REFUTE" - If the extracted answer cannot be proven false"""
+
+ANSWER_EXTRACTION_PROMPT_V1 = """Extract ONLY the specific named entity, term, or value that directly answers the question. Return nothing but this core answer without any explanatory text or context.
+
+Question: {{question}}
+LLM Answer: {{predicted_answer}}
+
+Instructions:
+1. Identify what specific piece of information the question is asking for (a name, date, number, place, etc.)
+2. Find the exact answer to this request in the LLM's response
+3. Extract ONLY that specific answer element - no articles, no explanations, no qualifiers
+4. The extracted answer should be comparable to this reference format: "{{answer}}"
+
+EXTRACTED ANSWER:"""
