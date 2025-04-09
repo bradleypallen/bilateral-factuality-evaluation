@@ -58,7 +58,12 @@ class Model:
             "google/gemma-2-27b-it",
             "microsoft/phi-4",
             "deepseek/deepseek-r1-distill-llama-8b",
-            "google/gemini-2.0-flash-001"
+            "google/gemini-2.0-flash-001",
+            "qwen/qwen-2.5-72b-instruct",
+            "qwen/qwq-32b",
+            "meta-llama/llama-4-scout",
+            "meta-llama/llama-4-maverick",
+            "deepseek/deepseek-chat-v3-0324",
             ]:
             return ChatOpenAI(
                 openai_api_key=os.environ["OPENROUTER_API_KEY"],
