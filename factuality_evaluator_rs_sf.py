@@ -64,6 +64,7 @@ class Model:
             "meta-llama/llama-4-scout",
             "meta-llama/llama-4-maverick",
             "deepseek/deepseek-chat-v3-0324",
+            "allenai/olmo-2-0325-32b-instruct",
             ]:
             return ChatOpenAI(
                 openai_api_key=os.environ["OPENROUTER_API_KEY"],
