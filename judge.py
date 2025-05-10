@@ -1,18 +1,18 @@
 from model import Model
 from datetime import datetime, timezone
-from prompts import VERIFICATION_PROMPT_V8, REFUTATION_PROMPT_V8
+from prompts import BASELINE_VERIFICATION_PROMPT, BASELINE_REFUTATION_PROMPT
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import AIMessage
 from ast import literal_eval
 from time import perf_counter
 import re
 
-class FactualityEvaluator(Model):
+class Judge(Model):
     
-    def __init__(self, model_name, batch_size=1, temperature=0.1, verification_prompt=VERIFICATION_PROMPT_V8, refutation_prompt=REFUTATION_PROMPT_V8):
-        super().__init__(model_name, batch_size, temperature)
-        verify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=verification_prompt)
-        falsify_prompt = PromptTemplate(input_variables=["problem", "answer"], template=refutation_prompt)
+    def __init__(self, model_name, temperature=0.0, verification_prompt=BASELINE_VERIFICATION_PROMPT, refutation_prompt=BASELINE_REFUTATION_PROMPT):
+        super().__init__(model_name, temperature)
+        verify_prompt = PromptTemplate(input_variables=["question", "answer"], template=verification_prompt)
+        falsify_prompt = PromptTemplate(input_variables=["question", "answer"], template=refutation_prompt)
         self.verify_chain = verify_prompt | self.llm
         self.falsify_chain = falsify_prompt | self.llm
 
@@ -44,8 +44,16 @@ class FactualityEvaluator(Model):
             return [ None, None ]
         else:
             raise ValueError(f'Invalid result pair: {verification_result}, {refutation_result}.')
+        
+    def _truth_value_to_wk_truth_value(self, tv):
+        if tv[0] and not tv[1]:
+            return True
+        elif tv[1] and not tv[0]:
+            return False
+        else:
+            return None
     
-    def _truth_value_to_string(self, tv):
+    def _wk_truth_value_to_string(self, tv):
         if tv:
             return 't'
         elif tv is None:
@@ -64,7 +72,7 @@ class FactualityEvaluator(Model):
     def _total_tokens_used(self, verifications, refutations):
         return sum([ self._tokens_used(v) for v in verifications ]) + sum([ self._tokens_used(r) for r in refutations ])
     
-    def invoke(self, datapoint, samples=1):
+    def invoke(self, dataset_name, datapoint, samples=1):
         t1 = perf_counter()
         verification_responses = [ self.verify_chain.invoke(datapoint) for i in range(samples) ]
         refutation_responses = [ self.falsify_chain.invoke(datapoint) for i in range(samples) ]
@@ -75,14 +83,16 @@ class FactualityEvaluator(Model):
         refutations_content = [ r.content if isinstance(r, AIMessage) else r for r in refutation_responses ]
         tokens_used = self._total_tokens_used(verifications_metadata, refutations_metadata)
         truth_value = self._truth_value(verifications_content, refutations_content)
-        I_0 = self._truth_value_to_string(truth_value[0])
-        I_1 = self._truth_value_to_string(truth_value[1])
+        wk_v = self._truth_value_to_wk_truth_value(truth_value)
+        I_0 = self._wk_truth_value_to_string(truth_value[0])
+        I_1 = self._wk_truth_value_to_string(truth_value[1])
         I = f'<{I_0},{I_1}>'
         return {
-            "problem": datapoint["problem"],
+            "question": datapoint["question"],
             "answer": datapoint["answer"],
             "label": datapoint["label"] if "label" in datapoint else None,
             "model_name": self.model_name,
+            "dataset_name": dataset_name,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "execution_time": t2 - t1,
             "tokens_used": tokens_used,
@@ -90,5 +100,6 @@ class FactualityEvaluator(Model):
             "refutations": refutations_content,
             "I_0": I_0,
             "I_1": I_1,
-            "I": I
+            "I": I,
+            "wk_v": wk_v
         }
