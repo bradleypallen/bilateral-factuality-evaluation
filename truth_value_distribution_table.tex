@@ -1,0 +1,47 @@
+\begin{table}[htbp]
+\caption{Distribution of bilateral truth values different judge models and evaluation prompts on three datasets (N=100).}
+\label{tab:exptvdist}
+\begin{tabular}{lllrrrrr}
+\toprule
+Dataset & Judge Model & Prompt & Macro-F1 & <t,t> & <t,f> & <f,t> & <f,f> \\
+\midrule
+gpqa & claude-3-5-haiku-20241022 & baseline & 0.562 & 0.08 & 0.59 & 0.25 & 0.08 \\
+gpqa & claude-3-5-haiku-20241022 & few & 0.638 & 0.48 & 0.28 & 0.19 & 0.05 \\
+gpqa & claude-3-5-haiku-20241022 & zero & 0.66 & 0.5 & 0.23 & 0.19 & 0.08 \\
+gpqa & claude-3-5-sonnet-20241022 & baseline & 0.701 & 0.19 & 0.43 & 0.34 & 0.04 \\
+gpqa & claude-3-5-sonnet-20241022 & few & 0.708 & 0.43 & 0.23 & 0.33 & 0.01 \\
+gpqa & claude-3-5-sonnet-20241022 & zero & 0.717 & 0.45 & 0.21 & 0.3 & 0.04 \\
+gpqa & llama-4-maverick & baseline & 0.786 & 0.05 & 0.42 & 0.43 & 0.1 \\
+gpqa & llama-4-maverick & few & 0.771 & 0.13 & 0.44 & 0.39 & 0.04 \\
+gpqa & llama-4-maverick & zero & 0.773 & 0.35 & 0.24 & 0.38 & 0.03 \\
+gpqa & llama-4-scout & baseline & 0.763 & 0.07 & 0.35 & 0.37 & 0.21 \\
+gpqa & llama-4-scout & few & 0.71 & 0.26 & 0.38 & 0.31 & 0.05 \\
+gpqa & llama-4-scout & zero & 0.795 & 0.46 & 0.24 & 0.25 & 0.05 \\
+gpqa & nf-gpt-4o & baseline & 0.556 & 0.13 & 0.35 & 0.35 & 0.17 \\
+gpqa & nf-gpt-4o & few & 0.67 & 0.48 & 0.15 & 0.35 & 0.02 \\
+gpqa & nf-gpt-4o & zero & 0.621 & 0.5 & 0.13 & 0.34 & 0.03 \\
+gpqa & nf-gpt-4o-mini & baseline & 0.456 & 0.17 & 0.17 & 0.52 & 0.14 \\
+gpqa & nf-gpt-4o-mini & few & 0.361 & 0.47 & 0.03 & 0.5 & 0 \\
+gpqa & nf-gpt-4o-mini & zero & 0.368 & 0.57 & 0.01 & 0.42 & 0 \\
+simpleqa & claude-3-5-haiku-20241022 & baseline & 0.666 & 0.01 & 0.3 & 0.18 & 0.51 \\
+simpleqa & claude-3-5-haiku-20241022 & few & 0.606 & 0.14 & 0.18 & 0.21 & 0.47 \\
+simpleqa & claude-3-5-haiku-20241022 & zero & 0.689 & 0.18 & 0.11 & 0.2 & 0.51 \\
+simpleqa & claude-3-5-sonnet-20241022 & baseline & 0.866 & 0.04 & 0.23 & 0.3 & 0.43 \\
+simpleqa & claude-3-5-sonnet-20241022 & few & 0.642 & 0.32 & 0.12 & 0.49 & 0.07 \\
+simpleqa & claude-3-5-sonnet-20241022 & zero & 0.835 & 0.28 & 0.18 & 0.41 & 0.13 \\
+simpleqa & llama-4-maverick & baseline & 0.611 & 0.08 & 0.64 & 0.17 & 0.11 \\
+simpleqa & llama-4-maverick & few & 0.607 & 0.21 & 0.58 & 0.16 & 0.05 \\
+simpleqa & llama-4-maverick & zero & 0.644 & 0.41 & 0.42 & 0.17 & 0 \\
+simpleqa & llama-4-scout & baseline & 0.583 & 0.15 & 0.42 & 0.18 & 0.25 \\
+simpleqa & llama-4-scout & few & 0.494 & 0.25 & 0.59 & 0.09 & 0.07 \\
+simpleqa & llama-4-scout & zero & 0.748 & 0.68 & 0.21 & 0.1 & 0.01 \\
+simpleqa & nf-gpt-4o & baseline & 0.638 & 0.09 & 0.48 & 0.23 & 0.2 \\
+simpleqa & nf-gpt-4o & few & 0.782 & 0.51 & 0.17 & 0.3 & 0.02 \\
+simpleqa & nf-gpt-4o & zero & 0.772 & 0.6 & 0.09 & 0.31 & 0 \\
+simpleqa & nf-gpt-4o-mini & baseline & 0.547 & 0.12 & 0.24 & 0.49 & 0.15 \\
+simpleqa & nf-gpt-4o-mini & few & 0.517 & 0.43 & 0.33 & 0.17 & 0.07 \\
+simpleqa & nf-gpt-4o-mini & zero & 0.458 & 0.61 & 0.07 & 0.32 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
