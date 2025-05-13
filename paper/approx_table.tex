@@ -1,0 +1,47 @@
+\begin{table}[htbp]
+\caption{Comparison of Macro-F1 scores of differing epistemic policies.}
+\label{tab:expapprox}
+\begin{tabular}{lllrrrr}
+\toprule
+Dataset & Judge Model & Prompt & Macro-F1 & Coverage & Upper Macro-F1 & Lower Macro-F1 \\
+\midrule
+gpqa & claude-3-5-haiku-20241022 & baseline & 0.562 & 0.84 & 0.544 & 0.565 \\
+gpqa & claude-3-5-haiku-20241022 & few & 0.638 & 0.47 & 0.542 & 0.546 \\
+gpqa & claude-3-5-haiku-20241022 & zero & 0.66 & 0.42 & 0.578 & 0.52 \\
+gpqa & claude-3-5-sonnet-20241022 & baseline & 0.701 & 0.77 & 0.578 & 0.728 \\
+gpqa & claude-3-5-sonnet-20241022 & few & 0.708 & 0.56 & 0.596 & 0.599 \\
+gpqa & claude-3-5-sonnet-20241022 & zero & 0.717 & 0.51 & 0.576 & 0.613 \\
+gpqa & llama-4-maverick & baseline & 0.786 & 0.85 & 0.728 & 0.76 \\
+gpqa & llama-4-maverick & few & 0.771 & 0.83 & 0.71 & 0.738 \\
+gpqa & llama-4-maverick & zero & 0.773 & 0.62 & 0.71 & 0.618 \\
+gpqa & llama-4-scout & baseline & 0.763 & 0.72 & 0.653 & 0.72 \\
+gpqa & llama-4-scout & few & 0.71 & 0.69 & 0.638 & 0.644 \\
+gpqa & llama-4-scout & zero & 0.795 & 0.49 & 0.592 & 0.666 \\
+gpqa & nf-gpt-4o & baseline & 0.556 & 0.7 & 0.537 & 0.539 \\
+gpqa & nf-gpt-4o & few & 0.67 & 0.5 & 0.608 & 0.516 \\
+gpqa & nf-gpt-4o & zero & 0.621 & 0.47 & 0.548 & 0.524 \\
+gpqa & nf-gpt-4o-mini & baseline & 0.456 & 0.69 & 0.496 & 0.477 \\
+gpqa & nf-gpt-4o-mini & few & 0.361 & 0.53 & 0.538 & 0.346 \\
+gpqa & nf-gpt-4o-mini & zero & 0.368 & 0.43 & 0.52 & 0.355 \\
+simpleqa & claude-3-5-haiku-20241022 & baseline & 0.666 & 0.48 & 0.512 & 0.591 \\
+simpleqa & claude-3-5-haiku-20241022 & few & 0.606 & 0.39 & 0.545 & 0.519 \\
+simpleqa & claude-3-5-haiku-20241022 & zero & 0.689 & 0.31 & 0.529 & 0.574 \\
+simpleqa & claude-3-5-sonnet-20241022 & baseline & 0.866 & 0.53 & 0.63 & 0.733 \\
+simpleqa & claude-3-5-sonnet-20241022 & few & 0.642 & 0.61 & 0.639 & 0.546 \\
+simpleqa & claude-3-5-sonnet-20241022 & zero & 0.835 & 0.59 & 0.679 & 0.72 \\
+simpleqa & llama-4-maverick & baseline & 0.611 & 0.81 & 0.622 & 0.584 \\
+simpleqa & llama-4-maverick & few & 0.607 & 0.74 & 0.552 & 0.624 \\
+simpleqa & llama-4-maverick & zero & 0.644 & 0.59 & 0.54 & 0.597 \\
+simpleqa & llama-4-scout & baseline & 0.583 & 0.6 & 0.528 & 0.578 \\
+simpleqa & llama-4-scout & few & 0.494 & 0.68 & 0.457 & 0.569 \\
+simpleqa & llama-4-scout & zero & 0.748 & 0.31 & 0.469 & 0.588 \\
+simpleqa & nf-gpt-4o & baseline & 0.638 & 0.71 & 0.568 & 0.628 \\
+simpleqa & nf-gpt-4o & few & 0.782 & 0.47 & 0.607 & 0.613 \\
+simpleqa & nf-gpt-4o & zero & 0.772 & 0.4 & 0.637 & 0.507 \\
+simpleqa & nf-gpt-4o-mini & baseline & 0.547 & 0.73 & 0.531 & 0.544 \\
+simpleqa & nf-gpt-4o-mini & few & 0.517 & 0.5 & 0.485 & 0.495 \\
+simpleqa & nf-gpt-4o-mini & zero & 0.458 & 0.39 & 0.525 & 0.374 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
