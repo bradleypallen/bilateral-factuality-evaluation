@@ -65,7 +65,6 @@ def main():
             i = len(results)
             for datapoint in tqdm(data.records[i:], desc=f'{model.model_name:36} {prompt:9} {dataset:9}', initial=i, total=len(data.records)):
                 response = model.invoke(dataset, datapoint, samples=args.n_repeated_samples)
-                print(response)
                 results.append(response)
                 json.dump(results, open(filename, "w+"))
 
