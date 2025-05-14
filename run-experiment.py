@@ -32,12 +32,8 @@ def init_environment():
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run factuality evaluation experiments')
-    parser.add_argument('--dataset', type=str, default="simpleqa",
-                      help='Dataset for the experimental run (default: simpleqa)')
     parser.add_argument('--model', type=str, default="nf-gpt-4o-mini",
                       help='Model for the experimental run (default: nf-gpt-4o-mini)')
-    parser.add_argument('--prompt', type=str, default="baseline",
-                      help='Prompt type for the experimental run (default: baseline)')
     parser.add_argument('--dataset_samples', type=int, default=100,
                       help='Number of samples to use from the dataset (default: 100)')
     parser.add_argument('--n_repeated_samples', type=int, default=3,
@@ -51,27 +47,27 @@ def parse_args():
 def main():
     # Initialize environment variables
     init_environment()
-    
     # Parse command line arguments
     args = parse_args()
-    
     # Create experiment directory
     if not os.path.exists(f'experiments/{args.run_version}'):
         os.makedirs(f'experiments/{args.run_version}')
-    
-    # Evaluation
-    filename = f'experiments/{args.run_version}/{args.model.split("/")[-1]}-{args.prompt}-{args.dataset}.json'
-    model = BilateralJudge(args.model, args.prompt, temperature=0.1)
-    dataset = Dataset(args.dataset, sample_size=args.dataset_samples, random_seed=args.random_seed)
-
-    if os.path.isfile(filename):
-        results = json.load(open(filename, "r"))
-    else:
-        results = []
-    i = len(results)
-    for datapoint in tqdm(dataset.records[i:], desc=f'{model.model_name:36}', initial=i, total=len(dataset.records)):
-        results.append(model.invoke(args.dataset, datapoint, samples=args.n_repeated_samples))
-        json.dump(results, open(filename, "w+"))
+    # Evaluation   
+    for prompt in ["baseline", "zero", "few"]:
+        for dataset in ["gpqa", "simpleqa"]:
+            filename = f'experiments/{args.run_version}/{args.model.split("/")[-1]}-{prompt}-{dataset}.json'
+            model = BilateralJudge(args.model, prompt, temperature=0.1)
+            data = Dataset(dataset, sample_size=args.dataset_samples, random_seed=args.random_seed)
+            if os.path.isfile(filename):
+                results = json.load(open(filename, "r"))
+            else:
+                results = []
+            i = len(results)
+            for datapoint in tqdm(data.records[i:], desc=f'{model.model_name:36} {prompt:9} {dataset:9}', initial=i, total=len(data.records)):
+                response = model.invoke(dataset, datapoint, samples=args.n_repeated_samples)
+                print(response)
+                results.append(response)
+                json.dump(results, open(filename, "w+"))
 
 if __name__ == "__main__":
     main()
