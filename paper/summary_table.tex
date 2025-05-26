@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+\caption{Summary performance metrics for zeta.}
+\label{tab:summaryperf}
+\begin{tabular}{llllllllll}
+\toprule
+Dataset & Model Type & Macro-F1 & Coverage & <t,t> & <t,f> & <f,t> & <f,f> & Time (mean) & Tokens (mean) \\
+\midrule
+gpqa & flagship & 0.7046 & 0.6453 & 0.3002 & 0.2818 & 0.3636 & 0.05433 & 47.99 & 6151 \\
+gpqa & distilled & 0.5891 & 0.562 & 0.3673 & 0.2377 & 0.3246 & 0.07067 & 49.35 & 6005 \\
+simpleqa & flagship & 0.7277 & 0.6044 & 0.2719 & 0.3026 & 0.302 & 0.1236 & 28.15 & 3857 \\
+simpleqa & distilled & 0.6137 & 0.4914 & 0.2828 & 0.2541 & 0.2371 & 0.2252 & 27.67 & 3650 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
