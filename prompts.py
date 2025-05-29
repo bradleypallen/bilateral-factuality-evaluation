@@ -1,21 +1,112 @@
-FEW_SHOT_EVALUATION_PROMPT = """I'll provide you with a question and its proposed answer. 
-Determine whether the answer is TRUE or FALSE.
+DIRECT_EVALUATION_PROMPT = """Determine whether the following answer to the given question is TRUE or FALSE.
 
-Here are examples:
+Conclude with a single line containing ONLY one of these two words:
+TRUE
+FALSE
+
+Question: {question}
+Proposed answer: {answer}"""
+
+ZERO_SHOT_EVALUATION_PROMPT = """I'll provide you with a question and its proposed answer.
+Your task is to evaluate whether this answer is correct by following these steps:
+
+1. Analyze the exact meaning of both the question and answer, identifying any key terms that need clarification.
+2. Establish specific conditions that would make this answer true for this question.
+3. Provide direct evidence supporting the answer, including specific facts, examples, or authoritative references that confirm its accuracy.
+4. Test if the answer remains valid across all contexts where the question applies, noting any limitations or exceptions.
+5. Check for consistency with established knowledge in the relevant domain.
+6. Search for direct counterexamples or contradicting evidence that actively demonstrates why the answer is incorrect.
+7. Construct specific scenarios where the answer fails to hold true, even if the question's premises are accepted.
+8. Identify any logical inconsistencies, factual errors, or category mistakes within the answer.
+
+After analyzing the question and answer, provide a single line containing ONLY one of these two words:
+TRUE
+FALSE
+
+Question: {question}
+Proposed answer: {answer}"""
+
+FEW_SHOT_EVALUATION_PROMPT = """I'll provide you with a question and its proposed answer.
+Your task is to evaluate whether this answer is correct by following these steps:
+
+1. Analyze the exact meaning of both the question and answer, identifying any key terms that need clarification.
+2. Establish specific conditions that would make this answer true for this question.
+3. Provide direct evidence supporting the answer, including specific facts, examples, or authoritative references that confirm its accuracy.
+4. Test if the answer remains valid across all contexts where the question applies, noting any limitations or exceptions.
+5. Check for consistency with established knowledge in the relevant domain.
+6. Search for direct counterexamples or contradicting evidence that actively demonstrates why the answer is incorrect.
+7. Construct specific scenarios where the answer fails to hold true, even if the question's premises are accepted.
+8. Identify any logical inconsistencies, factual errors, or category mistakes within the answer.
+
+Here are examples of how to approach evaluation:
 
 Example 1:
 Question: Who was the first man to walk on the Moon?
 Proposed answer: Neil Armstrong
+Analyze the question and answer:
+Question: "Who was the first man to walk on the Moon?" This is a straightforward factual question seeking the identity of the first human to set foot on the lunar surface.
+Proposed answer: "Neil Armstrong" This is a name, presumably offered as the answer to the question.
+Establish conditions for truth:
+The answer is true if Neil Armstrong was indeed the first human to walk on the Moon.
+Provide supporting evidence:
+Historical records, NASA documentation, and countless reliable sources confirm that Neil Armstrong was the first person to walk on the Moon on July 20, 1969, during the Apollo 11 mission.
+Test validity across contexts:
+The answer holds true in all historical contexts related to the first Moon landing.
+Check for consistency with established knowledge:
+The answer aligns perfectly with established historical and scientific knowledge.
+Search for counterexamples:
+There are no credible counterexamples. No other individual is historically recognized as the first person to walk on the Moon.
+Construct failure scenarios:
+There are no scenarios where the answer fails, assuming the question refers to the generally accepted historical event.
+Identify logical inconsistencies:
+There are no logical inconsistencies or factual errors.
 TRUE
 
 Example 2:
 Question: What is the main ingredient in chocolate?
 Proposed answer: Sugar
+Analyze the question and answer:
+Question: "Chocolate is made from material" - This is an incomplete sentence. The question is implicitly asking "What material is chocolate made from?" or "What is a key material used to make chocolate?".
+Proposed answer: "Sugar" - This suggests that sugar is the material chocolate is made from.
+Establish conditions for truth:
+The answer would be true if sugar was the only ingredient in chocolate, or if the question was interpreted as "Is sugar a material used to make chocolate?".
+Provide supporting evidence:
+Sugar is a common and significant ingredient in most chocolate recipes.
+Test validity across contexts:
+This answer fails in many contexts. Chocolate is not only made from sugar.
+Check for consistency with established knowledge:
+Chocolate is made from cacao beans, sugar, and often other ingredients like milk solids, cocoa butter, lecithin, and flavorings.
+Search for counterexamples:
+Dark chocolate often contains a higher percentage of cacao and less sugar.
+Sugar-free chocolate exists, using artificial sweeteners instead.
+Cacao beans are essential for chocolate, and chocolate cannot be made without them.
+Construct failure scenarios:
+Imagine a recipe for 100% cacao chocolate. It would contain no sugar.
+Imagine a sugar-free chocolate bar. It would contain no sugar.
+Identify logical inconsistencies:
+The answer implies sugar is the only ingredient, which is false.
 FALSE
 
 Example 3:
 Question: Are penguins birds?
 Proposed answer: No
+Analyze the question and answer:
+Question: "Are penguins birds?" This is a straightforward question about the classification of penguins.
+Proposed answer: "No" This answer asserts that penguins are not birds.
+Establish conditions for truth:
+The answer would be true if penguins did not possess the defining characteristics of birds.
+Provide supporting evidence:
+There is no supporting evidence. All available evidence points to penguins being birds.
+Test validity across contexts:
+The answer is invalid in all contexts related to biological classification.
+Check for consistency with established knowledge:
+The answer contradicts established biological knowledge. Penguins are classified as birds.
+Search for counterexamples:
+Penguins possess feathers, lay eggs, have wings (though modified for swimming), and have beaks. These are all characteristics of birds.
+Construct scenarios where the answer fails:
+Any scenario involving biological classification will demonstrate the falsity of the answer.
+Identify logical inconsistencies, factual errors, or category mistakes:
+The answer contains a factual error. Penguins are birds.
 FALSE
 
 After analyzing the question and answer, provide a single line containing ONLY one of these two words:
@@ -25,7 +116,7 @@ FALSE
 Question: {question}
 Proposed answer: {answer}"""
 
-BASELINE_VERIFICATION_PROMPT = """Determine whether the following answer to the given question is correct. 
+DIRECT_VERIFICATION_PROMPT = """Determine whether the following answer to the given question is correct. 
 Conclude with a single line containing ONLY one of these two phrases:
 VERIFIED
 CANNOT VERIFY
@@ -33,7 +124,7 @@ CANNOT VERIFY
 Question: {question}
 Proposed answer: {answer}"""
 
-BASELINE_REFUTATION_PROMPT = """Determine whether the following answer to the given question can be refuted. 
+DIRECT_REFUTATION_PROMPT = """Determine whether the following answer to the given question can be refuted. 
 Conclude with a single line containing ONLY one of these two phrases:
 REFUTED
 CANNOT REFUTE
