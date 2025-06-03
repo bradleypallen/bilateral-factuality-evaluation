@@ -1,0 +1,47 @@
+\begin{table}[htbp]
+\caption{Execution time and tokens used by different judge models and evaluation prompts on three datasets (N=100).}
+\label{tab:expcostsuni}
+\begin{tabular}{lllll}
+\toprule
+Dataset & Judge Model & Prompt & Mean Time & Mean Tokens Used \\
+\midrule
+gpqa & claude-3-5-haiku-20241022 & baseline &  14.25 (2.23) & 1346.54 (377.10) \\
+gpqa & claude-3-5-haiku-20241022 & few &  19.48 (1.55) & 4829.19 (327.03) \\
+gpqa & claude-3-5-haiku-20241022 & zero &  19.70 (2.44) & 2070.33 (328.06) \\
+gpqa & claude-3-5-sonnet-20241022 & baseline &  14.52 (2.92) & 1360.21 (386.44) \\
+gpqa & claude-3-5-sonnet-20241022 & few &  23.64 (2.85) & 5055.46 (382.93) \\
+gpqa & claude-3-5-sonnet-20241022 & zero &  19.29 (2.80) & 2161.70 (369.97) \\
+gpqa & llama-4-maverick & baseline &  26.83 (21.83) & 2919.78 (825.91) \\
+gpqa & llama-4-maverick & few &  24.49 (11.06) & 5756.76 (602.70) \\
+gpqa & llama-4-maverick & zero &  25.20 (10.44) & 3462.93 (665.47) \\
+gpqa & llama-4-scout & baseline &  30.07 (19.93) & 2467.57 (1096.58) \\
+gpqa & llama-4-scout & few &  24.38 (18.08) & 4955.30 (1124.60) \\
+gpqa & llama-4-scout & zero &  24.74 (18.10) & 2689.86 (1180.22) \\
+gpqa & nf-gpt-4o & baseline &   2.92 (7.85) & 546.73 (276.40) \\
+gpqa & nf-gpt-4o & few &   8.00 (8.50) & 3446.44 (343.78) \\
+gpqa & nf-gpt-4o & zero &   3.89 (4.92) & 1059.73 (276.40) \\
+gpqa & nf-gpt-4o-mini & baseline &   9.52 (6.61) & 1543.24 (848.31) \\
+gpqa & nf-gpt-4o-mini & few &  11.41 (2.60) & 4949.93 (477.92) \\
+gpqa & nf-gpt-4o-mini & zero &   6.60 (6.96) & 1722.51 (945.13) \\
+simpleqa & claude-3-5-haiku-20241022 & baseline &   6.69 (1.60) & 489.73 (91.76) \\
+simpleqa & claude-3-5-haiku-20241022 & few &  17.02 (1.55) & 4332.01 (63.46) \\
+simpleqa & claude-3-5-haiku-20241022 & zero &  16.29 (3.87) & 1505.90 (93.60) \\
+simpleqa & claude-3-5-sonnet-20241022 & baseline &   6.34 (1.59) & 453.53 (80.98) \\
+simpleqa & claude-3-5-sonnet-20241022 & few &  16.82 (1.99) & 4331.51 (89.63) \\
+simpleqa & claude-3-5-sonnet-20241022 & zero &  16.28 (5.05) & 1499.60 (112.18) \\
+simpleqa & llama-4-maverick & baseline &   6.71 (4.20) & 814.69 (350.94) \\
+simpleqa & llama-4-maverick & few &  16.97 (10.19) & 4524.26 (265.16) \\
+simpleqa & llama-4-maverick & zero &  14.88 (8.78) & 2097.99 (230.58) \\
+simpleqa & llama-4-scout & baseline &   5.73 (4.96) & 511.43 (286.82) \\
+simpleqa & llama-4-scout & few &   5.08 (6.68) & 3306.05 (376.05) \\
+simpleqa & llama-4-scout & zero &   8.62 (8.44) & 1192.79 (516.58) \\
+simpleqa & nf-gpt-4o & baseline &   2.55 (5.42) & 220.40 (30.07) \\
+simpleqa & nf-gpt-4o & few &   7.38 (9.60) & 3088.39 (30.07) \\
+simpleqa & nf-gpt-4o & zero &   3.49 (3.70) & 733.39 (30.07) \\
+simpleqa & nf-gpt-4o-mini & baseline &   1.08 (0.19) & 220.58 (30.79) \\
+simpleqa & nf-gpt-4o-mini & few &   6.75 (2.37) & 3923.80 (318.41) \\
+simpleqa & nf-gpt-4o-mini & zero &   1.56 (1.52) & 788.69 (185.84) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
